@@ -1,0 +1,110 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="interactivated" translate="label" sortOrder="100">
+            <label>Kiyoh</label>
+        </tab>
+        <section id="interactivated" translate="label" sortOrder="200" showInDefault="1" showInWebsite="1"
+                 showInStore="1">
+            <label>Kiyoh beoordelingen</label>
+            <tab>interactivated</tab>
+            <resource>Interactivated_Customerreview::config_interactivated</resource>
+            <group id="interactivated_customerreview" translate="label" sortOrder="10" showInDefault="1"
+                   showInWebsite="1" showInStore="1">
+                <label>Customers</label>
+                <comment>Version 2.1.14</comment>
+                <field id="custom_enable" translate="label" type="select" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <label>Enable:</label>
+                    <comment>Source model provider Magento's default Yes/No values</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="custom_connector" translate="label tooltip comment" sortOrder="1" type="text"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enter Connector</label>
+                    <comment>Enter here the Kiyoh Connector Code from your Kiyoh Account.</comment>
+                </field>
+                <field id="custom_action" translate="label tooltip comment" sortOrder="2" type="hidden"/>
+                <field id="custom_user" translate="label tooltip comment" sortOrder="3" type="text" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Company Email</label>
+                    <comment>Enter here your "company email address" as registered in your KiyOh account. Not the "user
+                        email address"!
+                    </comment>
+                </field>
+                <field id="custom_delay" translate="label tooltip comment" sortOrder="4" type="text" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Enter delay</label>
+                    <comment>Enter here the delay(number of days) after which you would like to send review invite email
+                        to your customer. This delay applies after customer event(Shipping/Purchase - to be selected at
+                        next option). You may enter 0 to send review invite email immediately after customer
+                        event(Shipping/Purchase).
+                    </comment>
+                </field>
+                <field id="custom_event" translate="label tooltip comment" sortOrder="5" type="select" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Select Event</label>
+                    <comment>Enter here the event after which you would like to send review invite email to your
+                        customer. Enter Shipping if your store sells products that need shipping. Enter Purchase if your
+                        store sells downloadable products(softwares).
+                    </comment>
+                    <source_model>Interactivated\Customerreview\Adminhtml\Model\System\Config\Source\Reviewevents</source_model>
+                </field>
+
+                <field id="custom_event_order_status" translate="label" sortOrder="6" type="multiselect"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Order Status</label>
+                    <source_model>Interactivated\Customerreview\Adminhtml\Model\System\Config\Source\Orderstatus</source_model>
+                </field>
+                <field id="custom_server" translate="label tooltip comment" sortOrder="7" type="select"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Select Server</label>
+                    <source_model>Interactivated\Customerreview\Adminhtml\Model\System\Config\Source\Reviewserver</source_model>
+                </field>
+                <field id="exclude_customer_groups" sortOrder="10" type="multiselect" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Exclude customer groups</label>
+                    <source_model>Magento\Customer\Model\Config\Source\Group</source_model>
+                </field>
+                <field id="language" translate="label tooltip comment" sortOrder="7" type="select"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Email template language</label>
+                    <source_model>Interactivated\Customerreview\Adminhtml\Model\System\Config\Source\Language</source_model>
+                    <depends>
+                        <field id="custom_server">kiyoh.com</field>
+                    </depends>
+                </field>
+                <field id="show_microdata" translate="label" type="select" sortOrder="8"  showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <label>Microdata functionality:</label>
+                    <comment>Add microdata functionality</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="show_rating" translate="label" type="select" sortOrder="9"  showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <label>Enable rating widget functionality:</label>
+                    <comment>Add rating functionality</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="show_microdata">1</field>
+                    </depends>
+                </field>
+                <field id="company_id" translate="label comment" sortOrder="10" type="text"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Company Id</label>
+                    <comment>Enter here the Company Id from your Kiyoh Account.</comment>
+                    <depends>
+                        <field id="show_microdata">1</field>
+                    </depends>
+                </field>
+                <!--<field id="debug_enable" translate="label" sortOrder="100" type="select" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Debug:</label>
+                    <comment>Debug file: var/log/debug.log</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>-->
+            </group>
+        </section>
+    </system>
+</config>

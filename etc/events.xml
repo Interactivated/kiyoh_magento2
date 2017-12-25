@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+  <event name="sales_order_shipment_save_after">
+    <observer name="customerreview" instance="Interactivated\Customerreview\Observer\SalesOrderShipmentSaveAfter"/>
+  </event>
+  <event name="sales_order_place_after">
+    <observer name="customerreview_payment" instance="Interactivated\Customerreview\Observer\SalesOrderPaymentAfter"/>
+  </event>
+  <event name="sales_order_save_after">
+    <observer name="customerreview_orderstatus_change" instance="Interactivated\Customerreview\Observer\SalesOrderSaveAfter"/>
+  </event>
+</config>
