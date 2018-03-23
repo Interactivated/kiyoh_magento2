@@ -7,7 +7,7 @@
     "type": "magento2-module",
     "version": "2.1.15",
     "license": [
-        "Proprietary"
+        "proprietary"
     ],
     "autoload": {
         "files": [
