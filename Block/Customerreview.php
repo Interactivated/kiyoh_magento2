@@ -11,44 +11,38 @@ class Customerreview extends Template
 {
     public $ratingString   = null;
     public $expirationTime = "+ 1 day";
-    protected $storeManagerInterface;
-
+    protected $scopeConfig = null;
     /**
      * @var Registry
      */
     protected $frameworkRegistry;
 
     public function __construct(Context $context,
-                                \Magento\Store\Model\StoreManagerInterface $storeManagerInterface,
                                 \Magento\Framework\Registry $registry,
                                 array $data = [])
     {
-        parent::__construct($context, $data);
-        $this->storeManagerInterface = $storeManagerInterface;
-        $currentStore = $this->storeManagerInterface->getStore();
-        $currentStoreId = $currentStore->getId();
-
-        $microdata = $this->_scopeConfig->getValue(
+        $this->scopeConfig = $context->getScopeConfig();
+        $microdata = $this->scopeConfig->getValue(
             'interactivated/interactivated_customerreview/show_microdata',
             ScopeInterface::SCOPE_STORE
         );
         if($microdata){
-            $cache_key = 'interactivated_kiyoh_rating_' . $currentStoreId;
+            $cache_key = 'interactivated_kiyoh_rating';
 
             $this->ratingString = $registry->registry($cache_key);
             if(!$this->ratingString){
                 $cache = $context->getCache();
                 $this->ratingString = unserialize($cache->load($cache_key));
                 if(!$this->ratingString){
-                    $connector = $this->_scopeConfig->getValue(
+                    $connector = $this->scopeConfig->getValue(
                         'interactivated/interactivated_customerreview/custom_connector',
                         ScopeInterface::SCOPE_STORE
                     );
-                    $company_id = $this->_scopeConfig->getValue(
+                    $company_id = $this->scopeConfig->getValue(
                         'interactivated/interactivated_customerreview/company_id',
                         ScopeInterface::SCOPE_STORE
                     );
-                    $custom_server = $this->_scopeConfig->getValue(
+                    $custom_server = $this->scopeConfig->getValue(
                         'interactivated/interactivated_customerreview/custom_server',
                         ScopeInterface::SCOPE_STORE
                     );
@@ -59,14 +53,11 @@ class Customerreview extends Template
                     curl_setopt($ch, CURLOPT_URL, $file);
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-                    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
                     $output = curl_exec($ch);
 
                     if (curl_errno($ch)) {
-                        $this->_logger->debug(
-                            'Techtwo_Kiyoh Curl error: ' . curl_error($ch),
-                            array(),
-                            true
+                        $context->getLogger()->debug(
+                            'Techtwo_Kiyoh Curl error: ' . curl_error($ch)
                         );
                     } else {
                         $doc = simplexml_load_string($output);
@@ -79,11 +70,10 @@ class Customerreview extends Template
                     curl_close($ch);
                     $cache->save(serialize($this->ratingString),$cache_key,array(),3600);
                 }
-                $registry->unregister($cache_key);
                 $registry->register($cache_key,$this->ratingString);
             }
         }
-
+        parent::__construct($context, $data);
     }
 
     public function _prepareLayout()
@@ -122,7 +112,7 @@ class Customerreview extends Template
         return false;
     }
     public function getShowRating(){
-        $show = $this->_scopeConfig->getValue(
+        $show = $this->scopeConfig->getValue(
             'interactivated/interactivated_customerreview/show_rating',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
