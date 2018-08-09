@@ -27,6 +27,7 @@ class Customerreview extends Template
         $this->storeManagerInterface = $storeManagerInterface;
         $currentStore = $this->storeManagerInterface->getStore();
         $currentStoreId = $currentStore->getId();
+        $this->cache = $context->getCache();
 
         $microdata = $this->_scopeConfig->getValue(
             'interactivated/interactivated_customerreview/show_microdata',
@@ -37,8 +38,7 @@ class Customerreview extends Template
 
             $this->ratingString = $registry->registry($cache_key);
             if(!$this->ratingString){
-                $cache = $context->getCache();
-                $this->ratingString = unserialize($cache->load($cache_key));
+                $this->ratingString = unserialize($this->cache->load($cache_key));
                 if(!$this->ratingString){
                     $connector = $this->_scopeConfig->getValue(
                         'interactivated/interactivated_customerreview/custom_connector',
@@ -63,21 +63,22 @@ class Customerreview extends Template
                     $output = curl_exec($ch);
 
                     if (curl_errno($ch)) {
-                        $this->_logger->debug(
-                            'Techtwo_Kiyoh Curl error: ' . curl_error($ch),
-                            array(),
-                            true
-                        );
+                        $this->log('Kiyoh Curl error: ' . curl_error($ch));
+                        $this->ratingString = $this->getPreviousValue($cache_key);
                     } else {
+                        libxml_use_internal_errors(true);
                         $doc = simplexml_load_string($output);
-                        if (!$doc) {
-
+                        if (!$doc || isset($doc->error)) {
+                            $this->log(libxml_get_errors());
+                            $this->log($doc->error);
+                            $this->ratingString = $this->getPreviousValue($cache_key);
                         } else {
                             $this->ratingString = json_decode(json_encode($doc), TRUE);
+                            $this->cache->save(serialize($this->ratingString),$cache_key,array(),3600);
+                            $this->cache->save(serialize($this->ratingString),$cache_key . '_woexpire',array());
                         }
                     }
                     curl_close($ch);
-                    $cache->save(serialize($this->ratingString),$cache_key,array(),3600);
                 }
                 $registry->unregister($cache_key);
                 $registry->register($cache_key,$this->ratingString);
@@ -140,5 +141,18 @@ class Customerreview extends Template
     }
     public function getMaxrating(){
         return 10;
+    }
+
+    public function getPreviousValue($cacheKey) {
+
+        return unserialize($this->cache->load($cacheKey . '_woexpire'));
+    }
+
+    public function log ($data) {
+        $this->_logger->debug(
+            var_export($data, true),
+            array(),
+            true
+        );
     }
 }
