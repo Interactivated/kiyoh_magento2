@@ -12,6 +12,7 @@ class Customerreview extends Template
     public $ratingString   = null;
     public $expirationTime = "+ 1 day";
     protected $storeManagerInterface;
+    protected $configWriter;
 
     /**
      * @var Registry
@@ -21,9 +22,12 @@ class Customerreview extends Template
     public function __construct(Context $context,
                                 \Magento\Store\Model\StoreManagerInterface $storeManagerInterface,
                                 \Magento\Framework\Registry $registry,
-                                array $data = [])
+                                array $data = [],
+                                \Magento\Framework\App\Config\Storage\WriterInterface $configWriter
+    )
     {
         parent::__construct($context, $data);
+        $this->configWriter = $configWriter;
         $this->storeManagerInterface = $storeManagerInterface;
         $currentStore = $this->storeManagerInterface->getStore();
         $currentStoreId = $currentStore->getId();
@@ -68,14 +72,16 @@ class Customerreview extends Template
                     } else {
                         libxml_use_internal_errors(true);
                         $doc = simplexml_load_string($output);
-                        if (!$doc || isset($doc->error)) {
+                        if (!$doc) {
                             $this->log(libxml_get_errors());
+                            $this->ratingString = $this->getPreviousValue($cache_key);
+                        } elseif (isset($doc->error)) {
                             $this->log($doc->error);
                             $this->ratingString = $this->getPreviousValue($cache_key);
                         } else {
                             $this->ratingString = json_decode(json_encode($doc), TRUE);
                             $this->cache->save(serialize($this->ratingString),$cache_key,array(),3600);
-                            $this->cache->save(serialize($this->ratingString),$cache_key . '_woexpire',array());
+                            $this->_saveToDb($cache_key, serialize($this->ratingString));
                         }
                     }
                     curl_close($ch);
@@ -144,8 +150,7 @@ class Customerreview extends Template
     }
 
     public function getPreviousValue($cacheKey) {
-
-        return unserialize($this->cache->load($cacheKey . '_woexpire'));
+        return unserialize($this->_scopeConfig->getValue('interactivated/interactivated_customerreview/kiyohresponse/' . $cacheKey));
     }
 
     public function log ($data) {
@@ -154,5 +159,9 @@ class Customerreview extends Template
             array(),
             true
         );
+    }
+
+    protected function _saveToDb($cacheKey, $value) {
+          $this->configWriter->save('interactivated/interactivated_customerreview/kiyohresponse/' . $cacheKey,  $value);
     }
 }
