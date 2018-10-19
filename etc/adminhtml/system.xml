@@ -13,27 +13,52 @@
             <group id="interactivated_customerreview" translate="label" sortOrder="10" showInDefault="1"
                    showInWebsite="1" showInStore="1">
                 <label>Customers</label>
-                <comment>Version 2.1.17</comment>
+                <comment>Version 2.1.18</comment>
                 <field id="custom_enable" translate="label" type="select" showInDefault="1" showInWebsite="1"
-                       showInStore="1">
+                       showInStore="1" sortOrder="10">
                     <label>Enable:</label>
                     <comment>Source model provider Magento's default Yes/No values</comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="custom_connector" translate="label tooltip comment" sortOrder="1" type="text"
+
+                <field id="network" translate="label tooltip comment" sortOrder="20" type="select"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Select Network</label>
+                    <source_model>Interactivated\Customerreview\Adminhtml\Model\System\Config\Source\Network</source_model>
+                </field>
+
+                <field id="custom_server" translate="label tooltip comment" sortOrder="22" type="select"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Select Server</label>
+                    <source_model>Interactivated\Customerreview\Adminhtml\Model\System\Config\Source\Reviewserver</source_model>
+                    <depends>
+                        <field id="network">kiyoh</field>
+                    </depends>
+                </field>
+
+                <field id="custom_connector" translate="label tooltip comment" sortOrder="30" type="text"
                        showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enter Connector</label>
                     <comment>Enter here the Kiyoh Connector Code from your Kiyoh Account.</comment>
+                    <depends>
+                        <field id="network">kiyoh</field>
+                    </depends>
                 </field>
-                <field id="custom_action" translate="label tooltip comment" sortOrder="2" type="hidden"/>
-                <field id="custom_user" translate="label tooltip comment" sortOrder="3" type="text" showInDefault="1"
+
+                <field id="custom_action" translate="label tooltip comment" sortOrder="50" type="hidden"/>
+
+                <field id="custom_user" translate="label tooltip comment" sortOrder="60" type="text" showInDefault="1"
                        showInWebsite="1" showInStore="1">
                     <label>Company Email</label>
                     <comment>Enter here your "company email address" as registered in your KiyOh account. Not the "user
                         email address"!
                     </comment>
+                    <depends>
+                        <field id="network">kiyoh</field>
+                    </depends>
                 </field>
-                <field id="custom_delay" translate="label tooltip comment" sortOrder="4" type="text" showInDefault="1"
+
+                <field id="custom_delay" translate="label tooltip comment" sortOrder="70" type="text" showInDefault="1"
                        showInWebsite="1" showInStore="1">
                     <label>Enter delay</label>
                     <comment>Enter here the delay(number of days) after which you would like to send review invite email
@@ -41,8 +66,12 @@
                         next option). You may enter 0 to send review invite email immediately after customer
                         event(Shipping/Purchase).
                     </comment>
+                    <depends>
+                        <field id="network">kiyoh</field>
+                    </depends>
                 </field>
-                <field id="custom_event" translate="label tooltip comment" sortOrder="5" type="select" showInDefault="1"
+
+                <field id="custom_event" translate="label tooltip comment" sortOrder="80" type="select" showInDefault="1"
                        showInWebsite="1" showInStore="1">
                     <label>Select Event</label>
                     <comment>Enter here the event after which you would like to send review invite email to your
@@ -52,36 +81,38 @@
                     <source_model>Interactivated\Customerreview\Adminhtml\Model\System\Config\Source\Reviewevents</source_model>
                 </field>
 
-                <field id="custom_event_order_status" translate="label" sortOrder="6" type="multiselect"
+                <field id="custom_event_order_status" translate="label" sortOrder="90" type="multiselect"
                        showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Order Status</label>
                     <source_model>Interactivated\Customerreview\Adminhtml\Model\System\Config\Source\Orderstatus</source_model>
                 </field>
-                <field id="custom_server" translate="label tooltip comment" sortOrder="7" type="select"
-                       showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Select Server</label>
-                    <source_model>Interactivated\Customerreview\Adminhtml\Model\System\Config\Source\Reviewserver</source_model>
-                </field>
-                <field id="exclude_customer_groups" sortOrder="10" type="multiselect" showInDefault="1"
+
+                <field id="exclude_customer_groups" sortOrder="100" type="multiselect" showInDefault="1"
                        showInWebsite="1" showInStore="1">
                     <label>Exclude customer groups</label>
                     <source_model>Magento\Customer\Model\Config\Source\Group</source_model>
                 </field>
-                <field id="language" translate="label tooltip comment" sortOrder="7" type="select"
+
+                <field id="language" translate="label tooltip comment" sortOrder="100" type="select"
                        showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Email template language</label>
                     <source_model>Interactivated\Customerreview\Adminhtml\Model\System\Config\Source\Language</source_model>
                     <depends>
+                        <field id="network">kiyoh</field>
                         <field id="custom_server">kiyoh.com</field>
                     </depends>
                 </field>
-                <field id="show_microdata" translate="label" type="select" sortOrder="8"  showInDefault="1" showInWebsite="1"
+
+                <field id="show_microdata" translate="label" type="select" sortOrder="110" showInDefault="1"
+                       showInWebsite="1"
                        showInStore="1">
                     <label>Microdata functionality:</label>
                     <comment>Add microdata functionality</comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="show_rating" translate="label" type="select" sortOrder="9"  showInDefault="1" showInWebsite="1"
+
+                <field id="show_rating" translate="label" type="select" sortOrder="120" showInDefault="1"
+                       showInWebsite="1"
                        showInStore="1">
                     <label>Enable rating widget functionality:</label>
                     <comment>Add rating functionality</comment>
@@ -90,20 +121,54 @@
                         <field id="show_microdata">1</field>
                     </depends>
                 </field>
-                <field id="company_id" translate="label comment" sortOrder="10" type="text"
+
+                <field id="company_id" translate="label comment" sortOrder="130" type="text"
                        showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Company Id</label>
                     <comment>Enter here the Company Id from your Kiyoh Account.</comment>
                     <depends>
                         <field id="show_microdata">1</field>
+                        <field id="network">kiyoh</field>
                     </depends>
                 </field>
-                <!--<field id="debug_enable" translate="label" sortOrder="100" type="select" showInDefault="1"
+
+                <!--klantenvertellen-->
+                <field id="hash" translate="label tooltip comment" sortOrder="30" type="text"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Hash</label>
+                    <depends>
+                        <field id="network">klantenvertellen</field>
+                    </depends>
+                </field>
+
+                <field id="location_id" translate="label tooltip comment" sortOrder="40" type="text"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Location ID</label>
+                    <comment>Enter here the Location ID from your Klantenvertellen Account.</comment>
+                    <depends>
+                        <field id="network">klantenvertellen</field>
+                    </depends>
+                </field>
+
+                <field id="custom_delay_1" translate="label tooltip comment" sortOrder="70" type="text" showInDefault="1"
                        showInWebsite="1" showInStore="1">
-                    <label>Debug:</label>
-                    <comment>Debug file: var/log/debug.log</comment>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>-->
+                    <label>Enter delay</label>
+                    <comment>Enter here the delay(number of days) after which you would like to send review invite email
+                        to your customer. This delay applies after customer event(Shipping/Purchase - to be selected at
+                        next option). Minimal is 1.
+                    </comment>
+                    <depends>
+                        <field id="network">klantenvertellen</field>
+                    </depends>
+                </field>
+
+                <field id="language_1" translate="label tooltip comment" sortOrder="100" type="text"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Language</label>
+                    <depends>
+                        <field id="network">klantenvertellen</field>
+                    </depends>
+                </field>
             </group>
         </section>
     </system>

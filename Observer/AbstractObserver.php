@@ -26,6 +26,10 @@ abstract class AbstractObserver
         $this->configScopeConfigInterface = $configScopeConfigInterface;
         $this->logLoggerInterface = $logLoggerInterface;
     }
+    /**
+     * @param \Magento\Sales\Model\Order $order
+     * @return null
+     */
     protected function _sendRequest($order)
     {
         $storeId = $order->getStoreId();
@@ -44,6 +48,12 @@ abstract class AbstractObserver
         }
 
         $email = $order->getCustomerEmail();
+        $interactivNetwork = $this->configScopeConfigInterface->getValue(
+            'interactivated/interactivated_customerreview/network',
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+
         $interactivServer = $this->configScopeConfigInterface->getValue(
             'interactivated/interactivated_customerreview/custom_server',
             ScopeInterface::SCOPE_STORE,
@@ -69,12 +79,52 @@ abstract class AbstractObserver
             ScopeInterface::SCOPE_STORE,
             $storeId
         );
-        $url = 'https://www.'.$interactivServer.'/set.php?user='.$interactivUser.
-            '&connector='.$interactivConnector.
-            '&action='.$interactivAction.
-            '&targetMail='.$email.
-            '&delay='.$interactivDelay;
+        if ($interactivNetwork == 'klantenvertellen') {
+            $hash = $this->configScopeConfigInterface->getValue(
+                'interactivated/interactivated_customerreview/hash',
+                ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
+            $location_id = $this->configScopeConfigInterface->getValue(
+                'interactivated/interactivated_customerreview/location_id',
+                ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
+            $custom_delay_1 = $this->configScopeConfigInterface->getValue(
+                'interactivated/interactivated_customerreview/custom_delay_1',
+                ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
+            $language_1 = $this->configScopeConfigInterface->getValue(
+                'interactivated/interactivated_customerreview/language_1',
+                ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
+            $invite_email = $email;
+            $first_name = $order->getCustomerFirstname();
+            $last_name = $order->getCustomerLastname();
+            if (!$first_name){
+                $first_name = $order->getShippingAddress()->getFirstname();
+            }
+            if (!$last_name){
+                $last_name = $order->getShippingAddress()->getLastname();
+            }
+            $url = "https://klantenvertellen.nl/v1/invite/external?" .
+                "hash={$hash}" .
+                "&location_id={$location_id}" .
+                "&invite_email={$invite_email}" .
+                "&delay={$custom_delay_1}" .
+                "&first_name={$first_name}" .
+                "&last_name={$last_name}" .
+                "&language={$language_1}";
+        } else {
+            $url = 'https://www.' . $interactivServer . '/set.php?user=' . $interactivUser .
+                '&connector=' . $interactivConnector .
+                '&action=' . $interactivAction .
+                '&targetMail=' . $email .
+                '&delay=' . $interactivDelay;
 
+        }
         try {
             // create a new cURL resource
             $curl = curl_init();
