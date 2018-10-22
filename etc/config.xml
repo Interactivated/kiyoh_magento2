@@ -1,13 +1,17 @@
 <?xml version="1.0"?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
-  <default>
-    <interactivated>
-      <interactivated_customerreview>
-        <custom_action>sendInvitation</custom_action>
-        <custom_server>kiyoh.nl</custom_server>
-        <debug_enable>1</debug_enable>
-        <show_rating>1</show_rating>
-      </interactivated_customerreview>
-    </interactivated>
-  </default>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <interactivated>
+            <interactivated_customerreview>
+                <custom_action>sendInvitation</custom_action>
+                <network>kiyoh</network>
+                <custom_server>kiyoh.nl</custom_server>
+                <debug_enable>1</debug_enable>
+                <show_rating>1</show_rating>
+                <language_1>nl</language_1>
+                <custom_delay_1>1</custom_delay_1>
+            </interactivated_customerreview>
+        </interactivated>
+    </default>
 </config>

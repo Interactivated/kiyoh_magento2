@@ -11,8 +11,8 @@ class Customerreview extends Template
 {
     public $ratingString   = null;
     public $expirationTime = "+ 1 day";
-    protected $storeManagerInterface;
     protected $configWriter;
+    protected $cache;
 
     /**
      * @var Registry
@@ -20,21 +20,22 @@ class Customerreview extends Template
     protected $frameworkRegistry;
 
     public function __construct(Context $context,
-                                \Magento\Store\Model\StoreManagerInterface $storeManagerInterface,
                                 \Magento\Framework\Registry $registry,
-                                array $data = [],
-                                \Magento\Framework\App\Config\Storage\WriterInterface $configWriter
-    )
+                                \Magento\Framework\App\Config\Storage\WriterInterface $configWriter,
+                                array $data = [])
     {
         parent::__construct($context, $data);
         $this->configWriter = $configWriter;
-        $this->storeManagerInterface = $storeManagerInterface;
-        $currentStore = $this->storeManagerInterface->getStore();
+        $currentStore = $this->_storeManager->getStore();
         $currentStoreId = $currentStore->getId();
         $this->cache = $context->getCache();
 
         $microdata = $this->_scopeConfig->getValue(
             'interactivated/interactivated_customerreview/show_microdata',
+            ScopeInterface::SCOPE_STORE
+        );
+        $network = $this->_scopeConfig->getValue(
+            'interactivated/interactivated_customerreview/network',
             ScopeInterface::SCOPE_STORE
         );
         if($microdata){
@@ -44,44 +45,84 @@ class Customerreview extends Template
             if(!$this->ratingString){
                 $this->ratingString = unserialize($this->cache->load($cache_key));
                 if(!$this->ratingString){
-                    $connector = $this->_scopeConfig->getValue(
-                        'interactivated/interactivated_customerreview/custom_connector',
-                        ScopeInterface::SCOPE_STORE
-                    );
-                    $company_id = $this->_scopeConfig->getValue(
-                        'interactivated/interactivated_customerreview/company_id',
-                        ScopeInterface::SCOPE_STORE
-                    );
-                    $custom_server = $this->_scopeConfig->getValue(
-                        'interactivated/interactivated_customerreview/custom_server',
-                        ScopeInterface::SCOPE_STORE
-                    );
-
-                    $file = 'https://'.$custom_server.'/xml/recent_company_reviews.xml?connectorcode='.$connector.'&company_id=' . $company_id;
 
                     $ch = curl_init();
-                    curl_setopt($ch, CURLOPT_URL, $file);
-                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-                    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-                    $output = curl_exec($ch);
+                    if ($network=='klantenvertellen'){
+                        $hash = $this->_scopeConfig->getValue(
+                            'interactivated/interactivated_customerreview/hash',
+                            ScopeInterface::SCOPE_STORE
+                        );
+                        $location_id = $this->_scopeConfig->getValue(
+                            'interactivated/interactivated_customerreview/location_id',
+                            ScopeInterface::SCOPE_STORE
+                        );
+                        $url = "https://klantenvertellen.nl/v1/publication/review/external?locationId=" . $location_id;
+                        $ch = curl_init();
 
-                    if (curl_errno($ch)) {
-                        $this->log('Kiyoh Curl error: ' . curl_error($ch));
-                        $this->ratingString = $this->getPreviousValue($cache_key);
-                    } else {
-                        libxml_use_internal_errors(true);
-                        $doc = simplexml_load_string($output);
-                        if (!$doc) {
-                            $this->log(libxml_get_errors());
+                        // set url
+                        curl_setopt($ch, CURLOPT_URL, $url);
+                        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                            'X-Publication-Api-Token: ' . $hash
+                        ));
+                        //return the transfer as a string
+                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                        // $output contains the output string
+                        $output = curl_exec($ch);
+                        try {
+                            $rating = json_decode($output, true);
+                            if ($rating && isset($rating['numberReviews'])){
+                                $this->ratingString['company'] = array();
+                                $this->ratingString['review_list'] = array();
+                                $this->ratingString['company']['total_reviews'] = $rating['numberReviews'];
+                                $this->ratingString['company']['total_score'] = $rating['averageRating'];
+                                $this->ratingString['company']['url'] = $rating['viewReviewUrl'];
+                                $this->cache->save(serialize($this->ratingString),$cache_key,array(),3600);
+                                $this->_saveToDb($cache_key, serialize($this->ratingString));
+                            } else {
+                                $this->ratingString = $this->getPreviousValue($cache_key);
+                            }
+                        } catch(\Exception $e){
                             $this->ratingString = $this->getPreviousValue($cache_key);
-                        } elseif (isset($doc->error)) {
-                            $this->log($doc->error);
+                        }
+                    } else {
+                        $connector = $this->_scopeConfig->getValue(
+                            'interactivated/interactivated_customerreview/custom_connector',
+                            ScopeInterface::SCOPE_STORE
+                        );
+                        $company_id = $this->_scopeConfig->getValue(
+                            'interactivated/interactivated_customerreview/company_id',
+                            ScopeInterface::SCOPE_STORE
+                        );
+                        $custom_server = $this->_scopeConfig->getValue(
+                            'interactivated/interactivated_customerreview/custom_server',
+                            ScopeInterface::SCOPE_STORE
+                        );
+
+                        $file = 'https://'.$custom_server.'/xml/recent_company_reviews.xml?connectorcode='.$connector.'&company_id=' . $company_id;
+
+                        curl_setopt($ch, CURLOPT_URL, $file);
+                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+                        $output = curl_exec($ch);
+
+                        if (curl_errno($ch)) {
+                            $this->log('Kiyoh Curl error: ' . curl_error($ch));
                             $this->ratingString = $this->getPreviousValue($cache_key);
                         } else {
-                            $this->ratingString = json_decode(json_encode($doc), TRUE);
-                            $this->cache->save(serialize($this->ratingString),$cache_key,array(),3600);
-                            $this->_saveToDb($cache_key, serialize($this->ratingString));
+                            libxml_use_internal_errors(true);
+                            $doc = simplexml_load_string($output);
+                            if (!$doc) {
+                                $this->log(libxml_get_errors());
+                                $this->ratingString = $this->getPreviousValue($cache_key);
+                            } elseif (isset($doc->error)) {
+                                $this->log($doc->error);
+                                $this->ratingString = $this->getPreviousValue($cache_key);
+                            } else {
+                                $this->ratingString = json_decode(json_encode($doc), TRUE);
+                                $this->cache->save(serialize($this->ratingString),$cache_key,array(),3600);
+                                $this->_saveToDb($cache_key, serialize($this->ratingString));
+                            }
                         }
                     }
                     curl_close($ch);
@@ -153,7 +194,7 @@ class Customerreview extends Template
         return unserialize($this->_scopeConfig->getValue('interactivated/interactivated_customerreview/kiyohresponse/' . $cacheKey));
     }
 
-    public function log ($data) {
+    public function log($data) {
         $this->_logger->debug(
             var_export($data, true),
             array(),
@@ -162,6 +203,6 @@ class Customerreview extends Template
     }
 
     protected function _saveToDb($cacheKey, $value) {
-          $this->configWriter->save('interactivated/interactivated_customerreview/kiyohresponse/' . $cacheKey,  $value);
+        $this->configWriter->save('interactivated/interactivated_customerreview/kiyohresponse/' . $cacheKey, $value);
     }
 }
