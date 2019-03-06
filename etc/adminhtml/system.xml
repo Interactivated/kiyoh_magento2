@@ -13,7 +13,7 @@
             <group id="interactivated_customerreview" translate="label" sortOrder="10" showInDefault="1"
                    showInWebsite="1" showInStore="1">
                 <label>Customers</label>
-                <comment>Version 2.1.18</comment>
+                <comment>Version 2.1.19</comment>
                 <field id="custom_enable" translate="label" type="select" showInDefault="1" showInWebsite="1"
                        showInStore="1" sortOrder="10">
                     <label>Enable:</label>
@@ -33,6 +33,15 @@
                     <source_model>Interactivated\Customerreview\Adminhtml\Model\System\Config\Source\Reviewserver</source_model>
                     <depends>
                         <field id="network">kiyoh</field>
+                    </depends>
+                </field>
+
+                <field id="custom_servernew" translate="label tooltip comment" sortOrder="22" type="select"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Select Server</label>
+                    <source_model>Interactivated\Customerreview\Adminhtml\Model\System\Config\Source\Reviewservernew</source_model>
+                    <depends>
+                        <field id="network">klantenvertellen</field>
                     </depends>
                 </field>
 

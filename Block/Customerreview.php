@@ -56,7 +56,15 @@ class Customerreview extends Template
                             'interactivated/interactivated_customerreview/location_id',
                             ScopeInterface::SCOPE_STORE
                         );
-                        $url = "https://klantenvertellen.nl/v1/publication/review/external?locationId=" . $location_id;
+                        $custom_servernew = $this->_scopeConfig->getValue(
+                            'interactivated/interactivated_customerreview/custom_servernew',
+                            ScopeInterface::SCOPE_STORE
+                        );
+                        $server = 'klantenvertellen.nl';
+                        if ($custom_servernew=='newkiyoh.com'){
+                            $server = 'kiyoh.com';
+                        }
+                        $url = "https://{$server}/v1/publication/review/external?locationId=" . $location_id;
                         $ch = curl_init();
 
                         // set url
