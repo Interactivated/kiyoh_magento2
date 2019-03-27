@@ -100,6 +100,11 @@ abstract class AbstractObserver
                 ScopeInterface::SCOPE_STORE,
                 $storeId
             );
+            $custom_servernew = $this->configScopeConfigInterface->getValue(
+                'interactivated/interactivated_customerreview/custom_servernew',
+                ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
             $invite_email = $email;
             $first_name = $order->getCustomerFirstname();
             $last_name = $order->getCustomerLastname();
@@ -109,7 +114,12 @@ abstract class AbstractObserver
             if (!$last_name){
                 $last_name = $order->getShippingAddress()->getLastname();
             }
-            $url = "https://klantenvertellen.nl/v1/invite/external?" .
+            $server = 'klantenvertellen.nl';
+            if($custom_servernew=='newkiyoh.com'){
+                $server = 'kiyoh.com';
+            }
+
+            $url = "https://{$server}/v1/invite/external?" .
                 "hash={$hash}" .
                 "&location_id={$location_id}" .
                 "&invite_email={$invite_email}" .

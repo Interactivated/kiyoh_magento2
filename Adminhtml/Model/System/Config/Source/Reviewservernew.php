@@ -5,7 +5,7 @@
  */
 namespace Interactivated\Customerreview\Adminhtml\Model\System\Config\Source;
 
-class Network
+class Reviewservernew
 {
 
     /**
@@ -16,8 +16,8 @@ class Network
     public function toOptionArray()
     {
         return [
-            ['value' => 'kiyoh', 'label'=>__('Old Kiyoh.com & kiyoh.nl')],
-            ['value' => 'klantenvertellen', 'label'=>__('Klantenvertellen.nl & new kiyoh.com')],
+            ['value' => 'klantenvertellen.nl', 'label'=>__('Klantenvertellen.nl')],
+            ['value' => 'newkiyoh.com', 'label'=>__('Kiyoh.com (International)')],
         ];
     }
 }
