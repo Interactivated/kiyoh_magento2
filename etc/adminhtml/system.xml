@@ -13,7 +13,7 @@
             <group id="interactivated_customerreview" translate="label" sortOrder="10" showInDefault="1"
                    showInWebsite="1" showInStore="1">
                 <label>Customers</label>
-                <comment>Version 2.1.19</comment>
+                <comment>Version 2.1.20</comment>
                 <field id="custom_enable" translate="label" type="select" showInDefault="1" showInWebsite="1"
                        showInStore="1" sortOrder="10">
                     <label>Enable:</label>
@@ -164,7 +164,8 @@
                     <label>Enter delay</label>
                     <comment>Enter here the delay(number of days) after which you would like to send review invite email
                         to your customer. This delay applies after customer event(Shipping/Purchase - to be selected at
-                        next option). Minimal is 1.
+                        next option).  You may enter 0 to send review invite email immediately after customer
+                        event(Shipping/Purchase).
                     </comment>
                     <depends>
                         <field id="network">klantenvertellen</field>
