@@ -74,6 +74,7 @@ class Customerreview extends Template
                         ));
                         //return the transfer as a string
                         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                        curl_setopt($ch, CURLOPT_TIMEOUT, 2);
                         // $output contains the output string
                         $output = curl_exec($ch);
                         try {
@@ -88,9 +89,11 @@ class Customerreview extends Template
                                 $this->_saveToDb($cache_key, serialize($this->ratingString));
                             } else {
                                 $this->ratingString = $this->getPreviousValue($cache_key);
+                                $this->_saveToDb($cache_key, serialize($this->ratingString));
                             }
                         } catch(\Exception $e){
                             $this->ratingString = $this->getPreviousValue($cache_key);
+                            $this->_saveToDb($cache_key, serialize($this->ratingString));
                         }
                     } else {
                         $connector = $this->_scopeConfig->getValue(
@@ -111,7 +114,7 @@ class Customerreview extends Template
                         curl_setopt($ch, CURLOPT_URL, $file);
                         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-                        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+                        curl_setopt($ch, CURLOPT_TIMEOUT, 2);
                         $output = curl_exec($ch);
 
                         if (curl_errno($ch)) {
@@ -123,9 +126,11 @@ class Customerreview extends Template
                             if (!$doc) {
                                 $this->log(libxml_get_errors());
                                 $this->ratingString = $this->getPreviousValue($cache_key);
+                                $this->_saveToDb($cache_key, serialize($this->ratingString));
                             } elseif (isset($doc->error)) {
                                 $this->log($doc->error);
                                 $this->ratingString = $this->getPreviousValue($cache_key);
+                                $this->_saveToDb($cache_key, serialize($this->ratingString));
                             } else {
                                 $this->ratingString = json_decode(json_encode($doc), TRUE);
                                 $this->cache->save(serialize($this->ratingString),$cache_key,array(),3600);
@@ -140,11 +145,6 @@ class Customerreview extends Template
             }
         }
 
-    }
-
-    public function _prepareLayout()
-    {
-        return parent::_prepareLayout();
     }
 
     public function getCustomerreview()
