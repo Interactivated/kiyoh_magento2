@@ -132,7 +132,7 @@ class Customerreview extends Template
                                 $this->ratingString = $this->getPreviousValue($cache_key);
                                 $this->_saveToDb($cache_key, json_encode($this->ratingString));
                             } else {
-                                $this->ratingString = json_decode(json_encode($doc), TRUE);
+                                $this->ratingString = json_decode(json_encode($doc), true);
                                 $this->cache->save(json_encode($this->ratingString),$cache_key,array(),3600);
                                 $this->_saveToDb($cache_key, json_encode($this->ratingString));
                             }
@@ -199,7 +199,7 @@ class Customerreview extends Template
     }
 
     public function getPreviousValue($cacheKey) {
-        return json_decode($this->_scopeConfig->getValue('interactivated/interactivated_customerreview/kiyohresponse/' . $cacheKey));
+        return json_decode($this->_scopeConfig->getValue('interactivated/interactivated_customerreview/kiyohresponse/' . $cacheKey),true);
     }
 
     public function log($data) {
