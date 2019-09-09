@@ -43,7 +43,7 @@ class Customerreview extends Template
 
             $this->ratingString = $registry->registry($cache_key);
             if(!$this->ratingString){
-                $this->ratingString = unserialize($this->cache->load($cache_key));
+                $this->ratingString = json_decode($this->cache->load($cache_key),true);
                 if(!$this->ratingString){
 
                     $ch = curl_init();
@@ -74,6 +74,7 @@ class Customerreview extends Template
                         ));
                         //return the transfer as a string
                         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                        curl_setopt($ch, CURLOPT_TIMEOUT, 2);
                         // $output contains the output string
                         $output = curl_exec($ch);
                         try {
@@ -84,13 +85,15 @@ class Customerreview extends Template
                                 $this->ratingString['company']['total_reviews'] = $rating['numberReviews'];
                                 $this->ratingString['company']['total_score'] = $rating['averageRating'];
                                 $this->ratingString['company']['url'] = $rating['viewReviewUrl'];
-                                $this->cache->save(serialize($this->ratingString),$cache_key,array(),3600);
-                                $this->_saveToDb($cache_key, serialize($this->ratingString));
+                                $this->cache->save(json_encode($this->ratingString),$cache_key,array(),3600);
+                                $this->_saveToDb($cache_key, json_encode($this->ratingString));
                             } else {
                                 $this->ratingString = $this->getPreviousValue($cache_key);
+                                $this->_saveToDb($cache_key, json_encode($this->ratingString));
                             }
                         } catch(\Exception $e){
                             $this->ratingString = $this->getPreviousValue($cache_key);
+                            $this->_saveToDb($cache_key, json_encode($this->ratingString));
                         }
                     } else {
                         $connector = $this->_scopeConfig->getValue(
@@ -111,7 +114,7 @@ class Customerreview extends Template
                         curl_setopt($ch, CURLOPT_URL, $file);
                         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-                        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+                        curl_setopt($ch, CURLOPT_TIMEOUT, 2);
                         $output = curl_exec($ch);
 
                         if (curl_errno($ch)) {
@@ -123,13 +126,15 @@ class Customerreview extends Template
                             if (!$doc) {
                                 $this->log(libxml_get_errors());
                                 $this->ratingString = $this->getPreviousValue($cache_key);
+                                $this->_saveToDb($cache_key, json_encode($this->ratingString));
                             } elseif (isset($doc->error)) {
                                 $this->log($doc->error);
                                 $this->ratingString = $this->getPreviousValue($cache_key);
+                                $this->_saveToDb($cache_key, json_encode($this->ratingString));
                             } else {
-                                $this->ratingString = json_decode(json_encode($doc), TRUE);
-                                $this->cache->save(serialize($this->ratingString),$cache_key,array(),3600);
-                                $this->_saveToDb($cache_key, serialize($this->ratingString));
+                                $this->ratingString = json_decode(json_encode($doc), true);
+                                $this->cache->save(json_encode($this->ratingString),$cache_key,array(),3600);
+                                $this->_saveToDb($cache_key, json_encode($this->ratingString));
                             }
                         }
                     }
@@ -140,11 +145,6 @@ class Customerreview extends Template
             }
         }
 
-    }
-
-    public function _prepareLayout()
-    {
-        return parent::_prepareLayout();
     }
 
     public function getCustomerreview()
@@ -199,7 +199,7 @@ class Customerreview extends Template
     }
 
     public function getPreviousValue($cacheKey) {
-        return unserialize($this->_scopeConfig->getValue('interactivated/interactivated_customerreview/kiyohresponse/' . $cacheKey));
+        return json_decode($this->_scopeConfig->getValue('interactivated/interactivated_customerreview/kiyohresponse/' . $cacheKey),true);
     }
 
     public function log($data) {
