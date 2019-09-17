@@ -74,7 +74,7 @@ class Customerreview extends Template
                         ));
                         //return the transfer as a string
                         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                        curl_setopt($ch, CURLOPT_TIMEOUT_MS, 200);
+                        curl_setopt($ch, CURLOPT_TIMEOUT, 1);
                         // $output contains the output string
                         $output = curl_exec($ch);
                         try {
@@ -114,7 +114,7 @@ class Customerreview extends Template
                         curl_setopt($ch, CURLOPT_URL, $file);
                         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-                        curl_setopt($ch, CURLOPT_TIMEOUT_MS, 200);
+                        curl_setopt($ch, CURLOPT_TIMEOUT, 1);
                         $output = curl_exec($ch);
 
                         if (curl_errno($ch)) {
