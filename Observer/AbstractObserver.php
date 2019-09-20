@@ -145,8 +145,8 @@ abstract class AbstractObserver
             curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($curl, CURLOPT_HEADER, false);
-            curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 10);
-            curl_setopt($curl, CURLOPT_TIMEOUT_MS, 200);
+            curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 2);
+            curl_setopt($curl, CURLOPT_TIMEOUT, 2);
             // grab URL and pass it to the browser
             $response = curl_exec($curl);
             if (curl_errno($curl)) {
