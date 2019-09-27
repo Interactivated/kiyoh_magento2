@@ -22,10 +22,12 @@ abstract class AbstractObserver
     public function __construct(
         ScopeConfigInterface $configScopeConfigInterface,
         LoggerInterface $logLoggerInterface
-    ) {
+    )
+    {
         $this->configScopeConfigInterface = $configScopeConfigInterface;
         $this->logLoggerInterface = $logLoggerInterface;
     }
+
     /**
      * @param \Magento\Sales\Model\Order $order
      * @return null
@@ -39,8 +41,8 @@ abstract class AbstractObserver
             $storeId
         );
         $excludeCustomerGroups = array();
-        if($group_string){
-            $excludeCustomerGroups = explode(',',$group_string);
+        if ($group_string) {
+            $excludeCustomerGroups = explode(',', $group_string);
         }
 
         if (in_array($order->getCustomerGroupId(), $excludeCustomerGroups)) {
@@ -108,32 +110,35 @@ abstract class AbstractObserver
             $invite_email = $email;
             $first_name = $order->getCustomerFirstname();
             $last_name = $order->getCustomerLastname();
-            if (!$first_name){
+            if (!$first_name) {
                 $first_name = $order->getShippingAddress()->getFirstname();
             }
-            if (!$last_name){
+            if (!$last_name) {
                 $last_name = $order->getShippingAddress()->getLastname();
             }
             $server = 'klantenvertellen.nl';
-            if($custom_servernew=='newkiyoh.com'){
+            if ($custom_servernew == 'newkiyoh.com') {
                 $server = 'kiyoh.com';
             }
-
-            $url = "https://{$server}/v1/invite/external?" .
-                "hash={$hash}" .
-                "&location_id={$location_id}" .
-                "&invite_email={$invite_email}" .
-                "&delay={$custom_delay_1}" .
-                "&first_name={$first_name}" .
-                "&last_name={$last_name}" .
-                "&language={$language_1}";
+            $vars = [
+                'hash' => $hash,
+                'location_id' => $location_id,
+                'invite_email' => $invite_email,
+                'delay' => $custom_delay_1,
+                'first_name' => $first_name,
+                'last_name' => $last_name,
+                'language' => $language_1
+            ];
+            $url = "https://{$server}/v1/invite/external?" . http_build_query($vars);
         } else {
-            $url = 'https://www.' . $interactivServer . '/set.php?user=' . $interactivUser .
-                '&connector=' . $interactivConnector .
-                '&action=' . $interactivAction .
-                '&targetMail=' . $email .
-                '&delay=' . $interactivDelay;
-
+            $vars = [
+                'user' => $interactivUser,
+                'connector' => $interactivConnector,
+                'action' => $interactivAction,
+                'targetMail' => $email,
+                'delay' => $interactivDelay
+            ];
+            $url = 'https://www.' . $interactivServer . '/set.php?' . http_build_query($vars);
         }
         try {
             // create a new cURL resource
@@ -151,7 +156,7 @@ abstract class AbstractObserver
             $response = curl_exec($curl);
             if (curl_errno($curl)) {
                 $this->logLoggerInterface->debug(
-                    $response.'---Url---'.$url,
+                    $response . '---Url---' . $url,
                     [],
                     true
                 );
