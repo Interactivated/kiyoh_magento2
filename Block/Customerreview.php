@@ -64,7 +64,7 @@ class Customerreview extends Template
                         if ($custom_servernew=='newkiyoh.com'){
                             $server = 'kiyoh.com';
                         }
-                        $url = "https://{$server}/v1/publication/review/external?locationId=" . $location_id;
+                        $url = "https://{$server}/v1/publication/review/external/location/statistics?locationId=" . $location_id;
                         $ch = curl_init();
 
                         // set url
