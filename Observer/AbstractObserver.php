@@ -154,15 +154,44 @@ abstract class AbstractObserver
             curl_setopt($curl, CURLOPT_TIMEOUT, 2);
             // grab URL and pass it to the browser
             $response = curl_exec($curl);
+            $log = false;
             if (curl_errno($curl)) {
-                $this->logLoggerInterface->debug(
-                    $response . '---Url---' . $url,
-                    [],
-                    true
-                );
+                $log = true;
+            }
+            if ($interactivNetwork == 'klantenvertellen') {
+                $parse = json_decode($response,true);
+                if (!$parse){
+                    $log = true;
+                } else {
+                    if(isset($parse['errorCode'])){
+                        $log = true;
+                    }
+                }
+            } else {
+                if (trim($response)!='OK'){
+                    $log = true;
+                }
+            }
+            $logenabled = $this->configScopeConfigInterface->getValue(
+                'interactivated/interactivated_customerreview/logerrors',
+                ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
+            if ($logenabled=='1'){
+                if ($log){
+                    $this->logLoggerInterface->error($response, [], true);
+                    $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/kiyoh.log');
+                    $logger = new \Zend\Log\Logger();
+                    $logger->addWriter($writer);
+                    $logger->info($response);
+                }
             }
         } catch (\Exception $e) {
-            $this->logLoggerInterface->debug($e->getMessage(), [], true);
+            $this->logLoggerInterface->error($e->getMessage(), [], true);
+            $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/kiyoh.log');
+            $logger = new \Zend\Log\Logger();
+            $logger->addWriter($writer);
+            $logger->info(var_export([$e->getMessage()],true));
         }
         curl_close($curl);
     }

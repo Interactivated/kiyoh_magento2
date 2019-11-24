@@ -13,7 +13,7 @@
             <group id="interactivated_customerreview" translate="label" sortOrder="10" showInDefault="1"
                    showInWebsite="1" showInStore="1">
                 <label>Customers</label>
-                <comment>Version 2.1.27</comment>
+                <comment>Version 2.1.28</comment>
                 <field id="custom_enable" translate="label" type="select" showInDefault="1" showInWebsite="1"
                        showInStore="1" sortOrder="10">
                     <label>Enable:</label>
@@ -178,6 +178,12 @@
                     <depends>
                         <field id="network">klantenvertellen</field>
                     </depends>
+                </field>
+
+                <field id="logerrors" translate="label" type="select" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="360">
+                    <label>Log errors</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>var/log/kiyoh.log</comment>
                 </field>
             </group>
         </section>
