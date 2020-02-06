@@ -6,16 +6,15 @@
 
 // @codingStandardsIgnoreFile
 
-?>
-<?php
-if($this->getCorrectData()):
-    $rating_percentage = $this->getRatingPercentage();
-    $maxrating = $this->getMaxrating();
-    $url = $this->getMicrodataUrl();
-    $rating = $this->getRating();
-    $reviews = $this->getReviews();
+/** @var \Interactivated\Customerreview\Block\Customerreview $block */
+if ($block->getCorrectData()):
+    $rating_percentage = $block->getRatingPercentage();
+    $maxrating = $block->getMaxrating();
+    $url = $block->getMicrodataUrl();
+    $rating = $block->getRating();
+    $reviews = $block->getReviews();
     $display = 'display:none;';
-    if($this->getShowRating()){
+    if ($block->getShowRating()) {
         $display = 'display:block;';
     }
     ?>
@@ -24,7 +23,9 @@ if($this->getCorrectData()):
         <div class="rating-box">
             <div class="rating" style="width:<?php echo $rating_percentage;?>%"></div>
         </div>
-        <div class="kiyoh-schema" itemscope="itemscope" itemtype="http://schema.org/WebPage">
+        <div class="kiyoh-schema" itemscope="itemscope" itemtype="http://schema.org/Organization">
+            <meta itemprop="name" content="<?php echo $block->getLocationName(); ?>"/>
+            <a href="<?php echo $block->getBaseUrl()?>" itemprop="url" style="display: none"><?php echo $block->getBaseUrl()?></a>
             <div itemprop="aggregateRating" itemscope="itemscope" itemtype="http://schema.org/AggregateRating">
                 <meta itemprop="bestRating" content="<?php echo $maxrating;?>">
                 <p>
