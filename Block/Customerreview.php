@@ -82,6 +82,7 @@ class Customerreview extends Template
                             if ($rating && isset($rating['numberReviews'])){
                                 $this->ratingString['company'] = array();
                                 $this->ratingString['review_list'] = array();
+                                $this->ratingString['company']['locationName'] = $rating['locationName'];
                                 $this->ratingString['company']['total_reviews'] = $rating['numberReviews'];
                                 $this->ratingString['company']['total_score'] = $rating['averageRating'];
                                 $this->ratingString['company']['url'] = $rating['viewReviewUrl'];
@@ -212,5 +213,12 @@ class Customerreview extends Template
 
     protected function _saveToDb($cacheKey, $value) {
         $this->configWriter->save('interactivated/interactivated_customerreview/kiyohresponse/' . $cacheKey, $value);
+    }
+    public function getLocationName(){
+        if (isset($this->ratingString['company']) && isset($this->ratingString['company']['locationName'])){
+            return $this->ratingString['company']['locationName'];
+        } else {
+            return $this->_scopeConfig->getValue('general/store_information/name', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        }
     }
 }
