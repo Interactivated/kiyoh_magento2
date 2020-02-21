@@ -6,9 +6,6 @@
  */
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
-    <head>
-        <css src="Interactivated_Customerreview::css/kiyohrating.css"/>
-    </head>
     <body>
         <referenceContainer name="header-wrapper">
             <block class="Interactivated\Customerreview\Block\Customerreview" name="top.kiyohmicrodata" as="top.kiyohmicrodata" template="Interactivated_Customerreview::microdata.phtml" />
