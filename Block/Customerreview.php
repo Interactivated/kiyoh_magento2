@@ -84,6 +84,7 @@ class Customerreview extends Template
                                 $this->ratingString['review_list'] = array();
                                 $this->ratingString['company']['locationName'] = $rating['locationName'];
                                 $this->ratingString['company']['total_reviews'] = $rating['numberReviews'];
+                                $this->ratingString['company']['recommendation'] = $rating['recommendation'];
                                 $this->ratingString['company']['total_score'] = $rating['averageRating'];
                                 $this->ratingString['company']['url'] = $rating['viewReviewUrl'];
                                 $this->cache->save(json_encode($this->ratingString),$cache_key,array(),3600);
@@ -162,6 +163,13 @@ class Customerreview extends Template
     public function getReviews(){
         if(isset($this->ratingString['company']['total_reviews'])){
             return $this->ratingString['company']['total_reviews'];
+        }
+        return false;
+    }
+
+    public function getRecommendationPercentage(){
+        if(isset($this->ratingString['company']['recommendation'])){
+            return $this->ratingString['company']['recommendation'];
         }
         return false;
     }
