@@ -13,7 +13,7 @@
             <group id="interactivated_customerreview" translate="label" sortOrder="10" showInDefault="1"
                    showInWebsite="1" showInStore="1">
                 <label>Customers</label>
-                <comment>Version 2.1.29</comment>
+                <comment>Version 2.1.30</comment>
                 <field id="custom_enable" translate="label" type="select" showInDefault="1" showInWebsite="1"
                        showInStore="1" sortOrder="10">
                     <label>Enable:</label>
