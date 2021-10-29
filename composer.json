@@ -1,8 +1,7 @@
 {
-    "name": "interactivated\/customerreview",
+    "name": "interactivated/customerreview",
     "description": "",
     "type": "magento2-module",
-    "version": "2.1.30",
     "license": [
         "proprietary"
     ],
