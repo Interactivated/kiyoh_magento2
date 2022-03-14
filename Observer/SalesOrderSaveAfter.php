@@ -37,11 +37,7 @@ class SalesOrderSaveAfter extends AbstractObserver implements ObserverInterface
                 $interactivatedOrderstatus
             )
         ) {
-            $this->logLoggerInterface->debug(
-                'salesOrderSaveAfter',
-                array(),
-                true
-            );
+            $this->logger->info('salesOrderSaveAfter');
             $this->_sendRequest($observer->getOrder());
         }
     }
