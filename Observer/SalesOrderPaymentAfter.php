@@ -25,11 +25,7 @@ class SalesOrderPaymentAfter extends AbstractObserver implements ObserverInterfa
         );
 
         if ($interactivEventval === 'Purchase' && $interactivStatus == '1') {
-            $this->logLoggerInterface->debug(
-                'salesOrderPaymentAfter',
-                [],
-                true
-            );
+            $this->logger->info('salesOrderPaymentAfter');
             $this->_sendRequest($order);
         }
     }

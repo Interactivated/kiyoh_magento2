@@ -26,11 +26,7 @@ class SalesOrderShipmentSaveAfter extends AbstractObserver implements ObserverIn
         );
 
         if ($interactivEventval === 'Shipping' && $interactivStatus == '1') {
-            $this->logLoggerInterface->debug(
-                'salesOrderShipmentSaveAfter',
-                [],
-                true
-            );
+            $this->logger->info('salesOrderShipmentSaveAfter');
             $this->_sendRequest($order);
         }
     }
