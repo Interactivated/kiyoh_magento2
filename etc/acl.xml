@@ -6,7 +6,7 @@
         <resource id="Magento_Backend::stores">
           <resource id="Magento_Backend::stores_settings">
             <resource id="Magento_Config::config">
-              <resource id="Interactivated_Customerreview::config_customconfig" title="Customers" sortOrder="100"/>
+              <resource id="Interactivated_Customerreview::config_interactivated" title="Customers" sortOrder="100"/>
             </resource>
           </resource>
         </resource>
