@@ -160,7 +160,10 @@ abstract class AbstractObserver
                 $log = true;
             }
             if ($interactivNetwork == 'klantenvertellen') {
-                $parse = json_decode($response,true);
+                $parse = null;
+                if ($response){
+                    $parse = json_decode($response,true);
+                }
                 if (!$parse){
                     $log = true;
                 } else {

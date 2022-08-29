@@ -1,4 +1,5 @@
 <?php
+
 namespace Interactivated\Customerreview\Block;
 
 use Magento\Framework\Registry;
@@ -9,7 +10,7 @@ use Psr\Log\LoggerInterface;
 
 class Customerreview extends Template
 {
-    public $ratingString   = null;
+    public $ratingString = null;
     public $expirationTime = "+ 1 day";
     protected $configWriter;
     protected $cache;
@@ -19,10 +20,10 @@ class Customerreview extends Template
      */
     protected $frameworkRegistry;
 
-    public function __construct(Context $context,
-                                \Magento\Framework\Registry $registry,
+    public function __construct(Context                                               $context,
+                                \Magento\Framework\Registry                           $registry,
                                 \Magento\Framework\App\Config\Storage\WriterInterface $configWriter,
-                                array $data = [])
+                                array                                                 $data = [])
     {
         parent::__construct($context, $data);
         $this->configWriter = $configWriter;
@@ -38,16 +39,18 @@ class Customerreview extends Template
             'interactivated/interactivated_customerreview/network',
             ScopeInterface::SCOPE_STORE
         );
-        if($microdata){
+        if ($microdata) {
             $cache_key = 'interactivated_kiyoh_rating_' . $currentStoreId;
 
             $this->ratingString = $registry->registry($cache_key);
-            if(!$this->ratingString){
-                $this->ratingString = json_decode($this->cache->load($cache_key),true);
-                if(!$this->ratingString){
-
+            if (!$this->ratingString) {
+                $cachedData = $this->cache->load($cache_key);
+                if ($cachedData) {
+                    $this->ratingString = json_decode($cachedData, true);
+                }
+                if (!$this->ratingString) {
                     $ch = curl_init();
-                    if ($network=='klantenvertellen'){
+                    if ($network == 'klantenvertellen') {
                         $hash = $this->_scopeConfig->getValue(
                             'interactivated/interactivated_customerreview/hash',
                             ScopeInterface::SCOPE_STORE
@@ -61,7 +64,7 @@ class Customerreview extends Template
                             ScopeInterface::SCOPE_STORE
                         );
                         $server = 'klantenvertellen.nl';
-                        if ($custom_servernew=='newkiyoh.com'){
+                        if ($custom_servernew == 'newkiyoh.com') {
                             $server = 'kiyoh.com';
                         }
                         $url = "https://{$server}/v1/publication/review/external/location/statistics?locationId=" . $location_id;
@@ -78,8 +81,11 @@ class Customerreview extends Template
                         // $output contains the output string
                         $output = curl_exec($ch);
                         try {
-                            $rating = json_decode($output, true);
-                            if ($rating && isset($rating['numberReviews'])){
+                            $rating = null;
+                            if ($output){
+                                $rating = json_decode($output, true);
+                            }
+                            if ($rating && isset($rating['numberReviews'])) {
                                 $this->ratingString['company'] = array();
                                 $this->ratingString['review_list'] = array();
                                 $this->ratingString['company']['locationName'] = $rating['locationName'];
@@ -87,13 +93,13 @@ class Customerreview extends Template
                                 $this->ratingString['company']['recommendation'] = $rating['recommendation'];
                                 $this->ratingString['company']['total_score'] = $rating['averageRating'];
                                 $this->ratingString['company']['url'] = $rating['viewReviewUrl'];
-                                $this->cache->save(json_encode($this->ratingString),$cache_key,array(),3600);
+                                $this->cache->save(json_encode($this->ratingString), $cache_key, array(), 3600);
                                 $this->_saveToDb($cache_key, json_encode($this->ratingString));
                             } else {
                                 $this->ratingString = $this->getPreviousValue($cache_key);
                                 $this->_saveToDb($cache_key, json_encode($this->ratingString));
                             }
-                        } catch(\Exception $e){
+                        } catch (\Exception $e) {
                             $this->ratingString = $this->getPreviousValue($cache_key);
                             $this->_saveToDb($cache_key, json_encode($this->ratingString));
                         }
@@ -111,7 +117,7 @@ class Customerreview extends Template
                             ScopeInterface::SCOPE_STORE
                         );
 
-                        $file = 'https://'.$custom_server.'/xml/recent_company_reviews.xml?connectorcode='.$connector.'&company_id=' . $company_id;
+                        $file = 'https://' . $custom_server . '/xml/recent_company_reviews.xml?connectorcode=' . $connector . '&company_id=' . $company_id;
 
                         curl_setopt($ch, CURLOPT_URL, $file);
                         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -135,7 +141,7 @@ class Customerreview extends Template
                                 $this->_saveToDb($cache_key, json_encode($this->ratingString));
                             } else {
                                 $this->ratingString = json_decode(json_encode($doc), true);
-                                $this->cache->save(json_encode($this->ratingString),$cache_key,array(),3600);
+                                $this->cache->save(json_encode($this->ratingString), $cache_key, array(), 3600);
                                 $this->_saveToDb($cache_key, json_encode($this->ratingString));
                             }
                         }
@@ -143,7 +149,7 @@ class Customerreview extends Template
                     curl_close($ch);
                 }
                 $registry->unregister($cache_key);
-                $registry->register($cache_key,$this->ratingString);
+                $registry->register($cache_key, $this->ratingString);
             }
         }
 
@@ -160,58 +166,76 @@ class Customerreview extends Template
         return $this->getData('customerreview');
     }
 
-    public function getReviews(){
-        if(isset($this->ratingString['company']['total_reviews'])){
+    public function getReviews()
+    {
+        if (isset($this->ratingString['company']['total_reviews'])) {
             return $this->ratingString['company']['total_reviews'];
         }
         return false;
     }
 
-    public function getRecommendationPercentage(){
-        if(isset($this->ratingString['company']['recommendation'])){
+    public function getRecommendationPercentage()
+    {
+        if (isset($this->ratingString['company']['recommendation'])) {
             return $this->ratingString['company']['recommendation'];
         }
         return false;
     }
 
-    public function getRating(){
-        if(isset($this->ratingString['company']['total_score'])){
+    public function getRating()
+    {
+        if (isset($this->ratingString['company']['total_score'])) {
             return $this->ratingString['company']['total_score'];
         }
         return false;
     }
-    public function getMicrodataUrl(){
-        if(isset($this->ratingString['company']['url'])){
+
+    public function getMicrodataUrl()
+    {
+        if (isset($this->ratingString['company']['url'])) {
             return $this->ratingString['company']['url'];
         }
         return false;
     }
-    public function getShowRating(){
+
+    public function getShowRating()
+    {
         $show = $this->_scopeConfig->getValue(
             'interactivated/interactivated_customerreview/show_rating',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
-        return $show=='1';
+        return $show == '1';
     }
-    public function getCorrectData(){
+
+    public function getCorrectData()
+    {
         return isset($this->ratingString['company']['total_reviews']);
     }
-    public function getRatingPercentage(){
-        if(isset($this->ratingString['company']['total_score'])){
+
+    public function getRatingPercentage()
+    {
+        if (isset($this->ratingString['company']['total_score'])) {
             $val = floatval($this->ratingString['company']['total_score']);
-            return ($val*10);
+            return ($val * 10);
         }
         return false;
     }
-    public function getMaxrating(){
+
+    public function getMaxrating()
+    {
         return 10;
     }
 
-    public function getPreviousValue($cacheKey) {
-        return json_decode($this->_scopeConfig->getValue('interactivated/interactivated_customerreview/kiyohresponse/' . $cacheKey),true);
+    public function getPreviousValue($cacheKey)
+    {
+        $value = $this->_scopeConfig->getValue('interactivated/interactivated_customerreview/kiyohresponse/' . $cacheKey);
+        if ($value){
+            return json_decode($value, true);
+        }
     }
 
-    public function log($data) {
+    public function log($data)
+    {
         $this->_logger->debug(
             var_export($data, true),
             array(),
@@ -219,11 +243,14 @@ class Customerreview extends Template
         );
     }
 
-    protected function _saveToDb($cacheKey, $value) {
+    protected function _saveToDb($cacheKey, $value)
+    {
         $this->configWriter->save('interactivated/interactivated_customerreview/kiyohresponse/' . $cacheKey, $value);
     }
-    public function getLocationName(){
-        if (isset($this->ratingString['company']) && isset($this->ratingString['company']['locationName'])){
+
+    public function getLocationName()
+    {
+        if (isset($this->ratingString['company']) && isset($this->ratingString['company']['locationName'])) {
             return $this->ratingString['company']['locationName'];
         } else {
             return $this->_scopeConfig->getValue('general/store_information/name', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
