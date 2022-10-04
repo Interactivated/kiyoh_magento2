@@ -21,14 +21,15 @@ class SalesOrderSaveAfter extends AbstractObserver implements ObserverInterface
             ScopeInterface::SCOPE_STORE,
             $storeId
         );
-        $interactivatedOrderstatus = explode(
-            ',',
-            $this->configScopeConfigInterface->getValue(
-                'interactivated/interactivated_customerreview/custom_event_order_status',
-                ScopeInterface::SCOPE_STORE,
-                $storeId
-            )
+        $customEventOrderStatus = $this->configScopeConfigInterface->getValue(
+            'interactivated/interactivated_customerreview/custom_event_order_status',
+            ScopeInterface::SCOPE_STORE,
+            $storeId
         );
+        if(!$customEventOrderStatus){
+            $customEventOrderStatus = '';
+        }
+        $interactivatedOrderstatus = explode(',',$customEventOrderStatus);
 
         if ($interactivatedEventval === 'Orderstatus' &&
             $interactivatedStatus == '1' &&
