@@ -180,19 +180,12 @@ abstract class AbstractObserver
             if ($logenabled=='1'){
                 if ($log){
                     $this->logLoggerInterface->error($response, [], true);
-                    $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/kiyoh.log');
-                    $logger = new \Zend\Log\Logger();
-                    $logger->addWriter($writer);
-                    $logger->info($response);
                 }
             }
         } catch (\Exception $e) {
             $this->logLoggerInterface->error($e->getMessage(), [], true);
-            $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/kiyoh.log');
-            $logger = new \Zend\Log\Logger();
-            $logger->addWriter($writer);
-            $logger->info(var_export([$e->getMessage()],true));
         }
+        
         curl_close($curl);
     }
 }
