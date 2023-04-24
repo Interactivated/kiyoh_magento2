@@ -92,6 +92,7 @@ class Customerreview extends Template
                                 $this->ratingString['company']['total_reviews'] = $rating['numberReviews'];
                                 $this->ratingString['company']['recommendation'] = $rating['recommendation'];
                                 $this->ratingString['company']['total_score'] = $rating['averageRating'];
+                                $this->ratingString['company']['last12MonthAverageRating'] = $rating['last12MonthAverageRating'];
                                 $this->ratingString['company']['url'] = $rating['viewReviewUrl'];
                                 $this->cache->save(json_encode($this->ratingString), $cache_key, array(), 3600);
                                 $this->_saveToDb($cache_key, json_encode($this->ratingString));
@@ -184,6 +185,13 @@ class Customerreview extends Template
 
     public function getRating()
     {
+        $ratingType = $this->_scopeConfig->getValue(
+            'interactivated/interactivated_customerreview/rating_type',
+            ScopeInterface::SCOPE_STORE
+        );
+        if ($ratingType=='12months' && isset($this->ratingString['company']['last12MonthAverageRating'])) {
+            return $this->ratingString['company']['last12MonthAverageRating'];
+        }
         if (isset($this->ratingString['company']['total_score'])) {
             return $this->ratingString['company']['total_score'];
         }
@@ -214,8 +222,9 @@ class Customerreview extends Template
 
     public function getRatingPercentage()
     {
-        if (isset($this->ratingString['company']['total_score'])) {
-            $val = floatval($this->ratingString['company']['total_score']);
+        $rating = $this->getRating();
+        if ($rating) {
+            $val = floatval($rating);
             return ($val * 10);
         }
         return false;

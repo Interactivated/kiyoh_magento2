@@ -13,7 +13,7 @@
             <group id="interactivated_customerreview" translate="label" sortOrder="10" showInDefault="1"
                    showInWebsite="1" showInStore="1">
                 <label>Customers</label>
-                <comment>Version 2.1.33</comment>
+                <comment>Version 2.1.35</comment>
                 <field id="custom_enable" translate="label" type="select" showInDefault="1" showInWebsite="1"
                        showInStore="1" sortOrder="10">
                     <label>Enable:</label>
@@ -176,6 +176,17 @@
                     <label>Language</label>
                     <depends>
                         <field id="network">klantenvertellen</field>
+                    </depends>
+                </field>
+                <field id="rating_type" translate="label tooltip comment" sortOrder="125" type="select"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Rating Type</label>
+                    <source_model>Interactivated\Customerreview\Adminhtml\Model\System\Config\Source\RatingType</source_model>
+                    <comment>
+                        By default, the system uses the overall average rating.
+                    </comment>
+                    <depends>
+                        <field id="show_rating">1</field>
                     </depends>
                 </field>
 
